@@ -1,0 +1,72 @@
+[build-system]
+requires = ["setuptools==80.9.0", "wheel==0.45.1"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cdq-python-dev"
+version = "0.0.1"
+requires-python = ">=3.10"
+description = ""
+readme = "README.md"
+authors = [
+    { name = "Piotr Nowakowski", email = "piotr.nowakowski@cdq.com" }
+]
+keywords = ["data-engineering"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12"
+]
+dependencies = [
+    "boto3",
+    "fastapi>=0.116.1",
+    "httpx",
+    "openpyxl>=3.1.5",
+    "pandas",
+    "pyarrow",
+    "pydantic>=2.11.7",
+    "pymongo",
+    "python-dotenv",
+    "typer>=0.17.3",
+    "uvicorn>=0.35.0",
+]
+
+[dependency-groups]
+dev = [
+    "black",
+    "faker>=37.5.3",
+    "faker",
+    "flake8",
+    "ipython>=8.37.0",
+    "isort",
+    "pytest>=8.4.1",
+]
+[tool.setuptools]
+zip-safe = false
+include-package-data = true
+
+[tool.setuptools.packages]
+find = { where = ["src"], namespaces = true}
+
+[tool.black]
+line-length = 88
+target-version = ['py312']
+exclude = '''
+/(
+    \.git
+  | \.mypy_cache
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+)/
+'''
+preview = true
+
+[tool.isort]
+atomic = true
+profile = "black"
+line_length = 88
+skip_gitignore = true
+known_first_party = ["black"]
+
