@@ -60,13 +60,32 @@ class MongoParquetTransfer(DataTransfer):
         ...
 
     """
+    @staticmethod
+    def batch_generator(iterable_source, batch_size: int):
+        buffer = []
+        for record in iterable_source:
+            buffer.append(record)
+            if len(buffer) == batch_size:
+                yield buffer
+                buffer = []
+        if buffer:
+            yield buffer
+
 
     def to_dataset(self, batch_size: int, name: str):
         schema_ = self.schema.as_arrow()
-        # FIXME: there goes the memory
-        data = pa.RecordBatch.from_pylist(list(self.source.read()), schema=schema_)
         basedir = self.context.workdir / name
-        ds.write_dataset(
-            data, base_dir=basedir.as_posix(), schema=schema_, format="parquet"
-        )
+        basedir.mkdir(parents=True, exist_ok=True)
+        batch_couinter = 0
+        for batch in self.batch_generator(self.source.read(), batch_size):
+            record_batch = pa.RecordBatch.from_pylist(batch, schema=schema_)
+            table = pa.Table.from_batches([record_batch], schema=schema_)
+            ds.write_dataset(
+                table,
+                base_dir=basedir.as_posix(),
+                schema=schema_,
+                format="parquet",
+                existing_data_behavior="overwrite_or_ignore",
+            )
+            batch_couinter += 1
         return ds.dataset(basedir.as_posix())
