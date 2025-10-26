@@ -70,3 +70,6 @@ line_length = 88
 skip_gitignore = true
 known_first_party = ["black"]
 
+[project.scripts]
+cdq-python = "cdq.analytics.cli.report_generate:app"
+
