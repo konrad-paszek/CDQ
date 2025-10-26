@@ -2,8 +2,11 @@ import os
 import tempfile
 from dataclasses import dataclass, field
 from pathlib import Path
+from pydantic import BaseModel
 
 import pyarrow.fs as fs
+
+from cdq.dto.fileinfo import FileInfo
 
 
 @dataclass
@@ -35,10 +38,11 @@ class ResultContext:
         shutil.rmtree(self.workdir, ignore_errors=False)
 
     def inspect(self):
-        # NOTE: why not wrapping these with cdq.dto.FileInfo?
-        return self.filesystem.get_file_info(
+        #TODO :add type and size
+        infos = self.filesystem.get_file_info(
             fs.FileSelector(self.workdir.as_posix(), recursive=True)
         )
+        return [FileInfo(path=info.path) for info in infos]
 # NOTE: what about other file systems (e.g. S3)?
 
 @dataclass
