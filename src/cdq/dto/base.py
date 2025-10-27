@@ -1,7 +1,5 @@
-from dataclasses import asdict, dataclass
+from pydantic import BaseModel
 
-
-@dataclass
-class Dto:
+class Dto(BaseModel):
     def to_dict(self):
-        return asdict(self)
+        return self.model_dump()

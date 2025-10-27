@@ -1,9 +1,8 @@
-from dataclasses import dataclass, field
 from typing import Optional, Type, Iterator
 
 import pyarrow as pa
+from pydantic import BaseModel, Field, PrivateAttr
 
-from .base import Dto
 
 
 def _as_arrow(type_: Type) -> pa.DataType:
@@ -16,8 +15,7 @@ def _as_arrow(type_: Type) -> pa.DataType:
     raise TypeError(f"unsupported type provided {type_}")
 
 
-@dataclass
-class Field:
+class FieldModel(BaseModel):
     name: str
     type: Type
 
@@ -25,33 +23,31 @@ class Field:
     def type_arrow(self) -> pa.DataType:
         return _as_arrow(self.type)
 
-class FieldContainer:
-    def __init__(self):
-        self._fields = {}
+class FieldContainer(BaseModel):
+    _fields: dict[str, FieldModel] = PrivateAttr(default_factory=dict)
 
-    def add(self, field: Field):
+    def add(self, field: FieldModel):
         self._fields[field.name] = field
 
-    def __iter__(self) -> Iterator[Field]:
+    def __iter__(self) -> Iterator[FieldModel]:
         return iter(self._fields.values())
 
-    def __getattr__(self, item):
-        if item in self._fields:
-            return self._fields[item]
-        raise AttributeError(f"'FieldContainer' has no attribute '{item}'")
+    def get(self, item):
+        return self._fields[item]
 
 
-@dataclass
-class Schema(Dto):
-    typemap: Optional[dict] = field(default=None)
+class Schema(BaseModel):
+    typemap: Optional[dict] = None
+    fields: FieldContainer = Field(default_factory=FieldContainer)
 
-    def __post_init__(self):
-        self.fields = FieldContainer()
-        if not self.typemap:
+    def __init__(self, **data):
+        super().__init__(**data)
+        if not self.typemap:  # post-init analog
             self.typemap = self.typemap_define()
+        self.fields = FieldContainer()
         for k, v in self.typemap.items():
-            field = Field(k, v)
-            setattr(self.fields, k, field)
+            field = FieldModel(name=k, type=v)
+            self.fields.add(field)
 
     def typemap_define(self) -> dict:
         raise NotImplementedError

@@ -1,10 +1,10 @@
 import os
-from dataclasses import dataclass
+from pydantic import BaseModel
 
 
-@dataclass
-class FileInfo:
-    path: os.PathLike
+
+class FileInfo(BaseModel):
+    path: str
 
     @property
     def name(self):

@@ -52,7 +52,7 @@ class Report(metaclass=ReportMeta):
     def to_excel(self, filepath: os.PathLike):
         self._ensure_processed()
         self.data.to_excel(filepath, index=False)
-        return FileInfo(filepath)
+        return FileInfo(path=filepath)
 
     def execute_hooks(self, hook_name):
         """
@@ -68,31 +68,6 @@ class Report(metaclass=ReportMeta):
         self.execute_hooks("before_transform")
         self.execute_hooks("on_transform")
         self.execute_hooks("after_transform")
-
-
-# # Example usage
-# class MyReport(Report):
-#     @execute('before_transform')
-#     def prep_data(self):
-#         print("Preparing data")
-#
-#     @execute('on_transform')
-#     def transform_step1(self):
-#         print("Transform step 1")
-#
-#     @execute('on_transform')
-#     def transform_step2(self):
-#         print("Transform step 2")
-#
-#     @execute('after_transform')
-#     def finalize(self):
-#         print("Finalizing report")
-#
-#     @execute('before_transform')
-#     def validate_input(self):
-#         print("Validating input")
-#
-
 
 class BusinessPartnerReport(Report):
     pass

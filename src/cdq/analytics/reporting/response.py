@@ -1,29 +1,27 @@
 import os
 import tempfile
-from dataclasses import dataclass, field
 from pathlib import Path
-from pydantic import BaseModel
-
+from typing import List
+from pydantic import BaseModel, PrivateAttr
 import pyarrow.fs as fs
 
 from cdq.dto.fileinfo import FileInfo
 
-
-@dataclass
-class ResultContext:
+class ResultContext(BaseModel):
     basedir: os.PathLike
-    _fs: fs.FileSystem = field(init=False)
-    _prefix: str = field(init=False)
-    _dir: Path = field(init=False)
+    _fs: fs.FileSystem = PrivateAttr()
+    _prefix: str = PrivateAttr()
+    _dir: Path = PrivateAttr()
 
-    def to_dict(self):
-        return {"workdir": self.workdir.as_posix(), "content": self.inspect()}
-
-    def __post_init__(self):
+    def __init__(self, **data):
+        super().__init__(**data)
         self._prefix = tempfile.mkdtemp()
         self._fs = fs.LocalFileSystem()
         self._dir = Path(f"{self._prefix}/{self.basedir}/")
         self._fs.create_dir(self._dir.as_posix())
+
+    def to_dict(self):
+        return {"workdir": self.workdir.as_posix(), "content": self.inspect()}
 
     @property
     def filesystem(self) -> fs.FileSystem:
@@ -37,16 +35,14 @@ class ResultContext:
         import shutil
         shutil.rmtree(self.workdir, ignore_errors=False)
 
-    def inspect(self):
-        #TODO :add type and size
+    def inspect(self) -> List[FileInfo]:
         infos = self.filesystem.get_file_info(
             fs.FileSelector(self.workdir.as_posix(), recursive=True)
         )
         return [FileInfo(path=info.path) for info in infos]
 # NOTE: what about other file systems (e.g. S3)?
 
-@dataclass
-class HandledResponse:
+class HandledResponse(BaseModel):
     status: str
     context: ResultContext
 
