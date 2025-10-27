@@ -1,6 +1,8 @@
 import importlib
 from typing import Type
-from pydantic import BaseModel, Field, PrivateAttr
+
+from pydantic import BaseModel, PrivateAttr
+
 
 class ClassProxy(BaseModel):
     classpath: str
@@ -15,12 +17,14 @@ class ClassProxy(BaseModel):
             self._class_instance = getattr(mod, clsname)
         return self._class_instance
 
+
 class ReportInfo(BaseModel):
     id: str
     schema: ClassProxy
     source: ClassProxy
     handler: ClassProxy
     report: ClassProxy
+
 
 business_partner_report = ReportInfo(
     id="business_partner_report",

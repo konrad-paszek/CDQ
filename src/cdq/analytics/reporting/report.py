@@ -69,5 +69,6 @@ class Report(metaclass=ReportMeta):
         self.execute_hooks("on_transform")
         self.execute_hooks("after_transform")
 
+
 class BusinessPartnerReport(Report):
     pass

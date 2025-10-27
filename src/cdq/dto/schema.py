@@ -1,8 +1,7 @@
-from typing import Optional, Type, Iterator
+from typing import Iterator, Optional, Type
 
 import pyarrow as pa
 from pydantic import BaseModel, Field, PrivateAttr
-
 
 
 def _as_arrow(type_: Type) -> pa.DataType:
@@ -22,6 +21,7 @@ class FieldModel(BaseModel):
     @property
     def type_arrow(self) -> pa.DataType:
         return _as_arrow(self.type)
+
 
 class FieldContainer(BaseModel):
     _fields: dict[str, FieldModel] = PrivateAttr(default_factory=dict)

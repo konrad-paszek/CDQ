@@ -60,6 +60,7 @@ class MongoParquetTransfer(DataTransfer):
         ...
 
     """
+
     @staticmethod
     def batch_generator(iterable_source, batch_size: int):
         buffer = []
@@ -70,7 +71,6 @@ class MongoParquetTransfer(DataTransfer):
                 buffer = []
         if buffer:
             yield buffer
-
 
     def to_dataset(self, batch_size: int, name: str):
         schema_ = self.schema.as_arrow()

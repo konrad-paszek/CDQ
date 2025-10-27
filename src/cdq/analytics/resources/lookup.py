@@ -1,5 +1,6 @@
 from .reports import business_partner_report
 
+
 class ResourceLookup:
 
     _reports = {

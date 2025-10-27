@@ -1,11 +1,12 @@
 from fastapi import FastAPI
 
-from cdq.analytics.api.models.report_params import ReportParams
 import cdq.infra.airflow as backend
+from cdq.analytics.api.models.report_params import ReportParams
 
 app = FastAPI()
 
 # NOTE: What, no pydantic?
+
 
 @app.post("/reportingJob/{reportId}/create")
 def create_report(params: ReportParams):

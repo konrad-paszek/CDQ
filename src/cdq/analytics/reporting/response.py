@@ -2,10 +2,12 @@ import os
 import tempfile
 from pathlib import Path
 from typing import List
-from pydantic import BaseModel, PrivateAttr
+
 import pyarrow.fs as fs
+from pydantic import BaseModel, PrivateAttr
 
 from cdq.dto.fileinfo import FileInfo
+
 
 class ResultContext(BaseModel):
     basedir: os.PathLike
@@ -33,6 +35,7 @@ class ResultContext(BaseModel):
 
     def teardown(self):
         import shutil
+
         shutil.rmtree(self.workdir, ignore_errors=False)
 
     def inspect(self) -> List[FileInfo]:
@@ -40,7 +43,10 @@ class ResultContext(BaseModel):
             fs.FileSelector(self.workdir.as_posix(), recursive=True)
         )
         return [FileInfo(path=info.path) for info in infos]
+
+
 # NOTE: what about other file systems (e.g. S3)?
+
 
 class HandledResponse(BaseModel):
     status: str
