@@ -2,6 +2,15 @@
 
 CDQ Python is a monorepo of loosely connected Python packages designed to solve reporting system challenges in our data analytics workflow.
 
+
+## What’s New and Important
+
+- **Pydantic-First Codebase:** All former `@dataclass` models (`Schema`, DTOs, `ReportRequest`, `FileInfo`, etc.) are now implemented as Pydantic models for unified, explicit validation and serialization.
+- **Safer, More Pythonic API:** Container classes (like `FieldContainer`) no longer rely on `__getattr__` magic that can cause recursion issues. Use `.get("field")` or direct dictionary access.
+- **Automated Formatting:** The entire codebase has been formatted using [black](https://github.com/psf/black) and imports sorted with [isort](https://github.com/PyCQA/isort). See the commit “Format code with black and isort” for details.
+- **Improved Configurability:** Reports, schemas, handlers, and batch processors are dynamically looked up using string-based proxies and a refactored, efficient lookup system.
+- **Comprehensive Refactor:** See commit history for specific refactors and added features, such as VAT support in schemas, CLI report generation, and batch processing tests.
+
 ## Overview
 
 This system allows clients to query MongoDB databases, transform data, and export results as Excel or CSV files through both interactive and automated workflows.
@@ -66,7 +75,7 @@ The following are the most critical problems that need attention:
 
 - **CLI Module**: Missing analytics CLI module. Our data analyst needs to execute:
   ```bash
-  cdq-python analytics report-generate DUMP_REPORT --format --title="I feel good"
+  cdq-python analytics report-generate DUMP_REPORT --format="xlsx" --title="I feel good"
   ```
 
 - **Report Enhancements**: Product Owner requests for the `business_partner_report`:
