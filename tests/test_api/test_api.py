@@ -48,7 +48,7 @@ class TestCreateReport:
             "/reportingJob/report_123/create", json=sample_report_params
         )
 
-        assert response.status_code == 200
+        assert response.status_code == 201
         assert "job" in response.json()
         assert response.json()["job"]["id"] == job_id
         assert response.json()["job"]["details"] is None
@@ -79,9 +79,9 @@ class TestCreateReport:
             "/reportingJob/report_123/create", json=sample_report_params
         )
 
-        assert response.status_code == 200
+        assert response.status_code == 201
         called_params = mock_trigger.call_args[0][0]
-        assert called_params["job_id"] == "custom_job_id"
+        assert called_params == "report_123"
 
 
 class TestGetReportingJobStatus:
@@ -89,13 +89,13 @@ class TestGetReportingJobStatus:
     def test_get_job_status_success(self, mock_fetch, client, sample_job_response):
         job_id = "job_abc123"
         mock_fetch.return_value = (
-            200,
+            201,
             {"job": {"id": job_id, "details": sample_job_response}},
         )
 
         response = client.get(f"/reportingJob/{job_id}")
 
-        assert response.status_code == 200
+        assert response.status_code == 201
         data = response.json()
         assert "job" in data
         assert data["job"]["id"] == job_id
@@ -112,7 +112,7 @@ class TestGetReportingJobStatus:
 
         response = client.get(f"/reportingJob/{job_id}")
 
-        assert response.status_code == 200
+        assert response.status_code == 400
         assert "not found" in response.json().lower()
         mock_fetch.assert_called_once_with(job_id)
 

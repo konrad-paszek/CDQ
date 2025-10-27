@@ -1,21 +1,19 @@
 import threading
-import time
-from queue import Queue
 
-from cdq.analytics.reporting.job import REPORTING_JOB_PARAMS, ReportingJob
+from cdq.analytics.reporting.job import ReportingJob
 
 xcom = {}
 lock = threading.RLock()
 
 
 def run_job(job):
-    # job = ReportingJob(params)
     resp = job.execute()
     with lock:
         xcom.update({job.jobid: resp.to_dict()})
 
 
-def trigger_reporting_job(params):
+def trigger_reporting_job(report_id, params):
+    params["report_id"] = report_id
     job = ReportingJob(params)
     t = threading.Thread(target=run_job, args=(job,))
     t.start()
